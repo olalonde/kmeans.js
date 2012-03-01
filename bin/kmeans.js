@@ -1,6 +1,8 @@
 var kmeans = require('../lib/kmeans'),
   vector = require('../lib/vector'),
-  fs = require('fs');
+  fs = require('fs'),
+  path = require('path'),
+  exec = require('child_process').exec;
 
 // Parse raw data
 function raw_data_to_vector_array() {
@@ -39,6 +41,21 @@ function vectors_to_csv(vectors) {
   return output;
 }
 
+// Output data to filesystem
+function save_iteration(iteration, folder) {
+  folder = folder || './out/';
+  if(!fs.existsSync(folder)) {
+    fs.mkdirSync(folder);
+  }
+  var means = [];
+  for(var i in iteration) {
+    var c = iteration[i];
+    means.push(c.mean);
+    fs.writeFileSync(folder + 'cluster' + i + '.csv', vectors_to_csv(c.vectors));
+  }
+  fs.writeFileSync(folder + 'means.csv', vectors_to_csv(means));
+}
+
 var filename = process.argv[2];
 var k = parseInt(process.argv[3]) || 3;
 
@@ -56,16 +73,16 @@ var vectors = raw_data_to_vector_array(raw_data);
 //console.log(observations);
 var res = kmeans.process(vectors, k);
 
-console.log(res.clusters());
+console.log('Finished after %s iterations', res.iterationCount);
+//console.log(res.clusters());
 
-// Output data to filesystem
-var means = [];
-for(var i in res.clusters()) {
-  var c = res.clusters()[i];
-  means.push(c.mean);
-  fs.writeFileSync('./out/cluster' + i + '.csv', vectors_to_csv(c.vectors));
-}
-fs.writeFileSync('./out/means.csv', vectors_to_csv(means));
+// Clean out/
+exec('rm -rf ./out/iteration*',
+  function (error, stdout, stderr) {
+    for(var i in res.iterations) {
+      save_iteration(res.iterations[i], './out/iteration' + i + '/');
+    }
+});
 
 //algo.step()
 //res.iterationCount;
