@@ -5,7 +5,7 @@ var kmeans = require('../lib/kmeans'),
   exec = require('child_process').exec;
 
 // Parse raw data
-function raw_data_to_vector_array() {
+function raw_data_to_array() {
   var observations = [];
   var new_line = '\n';
   var line = '';
@@ -18,7 +18,7 @@ function raw_data_to_vector_array() {
         observation[j] = parseFloat(observation[j]);
       }
       line = '';
-      observations.push(vector.create(observation));
+      observations.push(observation);
       continue;
     }
      line += char;
@@ -26,10 +26,10 @@ function raw_data_to_vector_array() {
   return observations;
 }
 
-function vectors_to_csv(vectors) {
+function array_to_csv(vectors) {
   var output = '';
   for(var i in vectors) {
-    var components = vectors[i].getComponents();
+    var components = vectors[i];
     var line = '';
     var delim = '';
     for(var j in components) {
@@ -44,16 +44,13 @@ function vectors_to_csv(vectors) {
 // Output data to filesystem
 function save_iteration(iteration, folder) {
   folder = folder || './out/';
-  if(!fs.existsSync(folder)) {
+  if(!require('path').existsSync(folder)) {
     fs.mkdirSync(folder);
   }
-  var means = [];
-  for(var i in iteration) {
-    var c = iteration[i];
-    means.push(c.mean);
-    fs.writeFileSync(folder + 'cluster' + i + '.csv', vectors_to_csv(c.vectors));
+  for(var i in iteration.clusters) {
+    fs.writeFileSync(folder + 'cluster' + i + '.csv', array_to_csv(iteration.clusters[i]));
   }
-  fs.writeFileSync(folder + 'means.csv', vectors_to_csv(means));
+  fs.writeFileSync(folder + 'means.csv', array_to_csv(iteration.means));
 }
 
 var filename = process.argv[2];
@@ -68,19 +65,20 @@ console.log('filename: ' + filename);
 console.log('k: ' + k);
 
 var raw_data = fs.readFileSync(filename).toString();
-var vectors = raw_data_to_vector_array(raw_data);
+var data = raw_data_to_array(raw_data);
 
 //console.log(observations);
-var res = kmeans.process(vectors, k);
+var km = kmeans.create(data, k);
+var res = km.process();
 
-console.log('Finished after %s iterations', res.iterationCount);
+console.log('Finished after %s iterations', km.iterationCount());
 //console.log(res.clusters());
 
 // Clean out/
 exec('rm -rf ./out/iteration*',
   function (error, stdout, stderr) {
-    for(var i in res.iterations) {
-      save_iteration(res.iterations[i], './out/iteration' + i + '/');
+    for(var i = 0; i < km.iterationCount(); i++) {
+      save_iteration(km.iteration(i), './out/iteration' + i + '/');
     }
 });
 
