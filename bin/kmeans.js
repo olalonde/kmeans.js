@@ -1,5 +1,6 @@
 var kmeans = require('../lib/kmeans'),
   vector = require('../lib/vector'),
+  utils = require('../lib/utils'),
   fs = require('fs'),
   path = require('path'),
   exec = require('child_process').exec;
@@ -21,7 +22,7 @@ function raw_data_to_array() {
       observations.push(observation);
       continue;
     }
-     line += char;
+    line += char;
   }
   return observations;
 }
@@ -53,6 +54,7 @@ function save_iteration(iteration, folder) {
   fs.writeFileSync(folder + 'means.csv', array_to_csv(iteration.means));
 }
 
+
 var filename = process.argv[2];
 var k = parseInt(process.argv[3]) || 3;
 
@@ -64,10 +66,15 @@ if(!filename) {
 console.log('filename: ' + filename);
 console.log('k: ' + k);
 
-var raw_data = fs.readFileSync(filename).toString();
-var data = raw_data_to_array(raw_data);
 
-//console.log(observations);
+var raw_data = fs.readFileSync(filename).toString();
+
+if(filename.substr(filename.length - 4, 4) === '.csv')
+  var data = utils.CSVToArray(raw_data, ',', true);
+else
+  var data = raw_data_to_array(raw_data);
+
+console.log(data);
 var km = kmeans.create(data, k);
 var res = km.process();
 
@@ -76,18 +83,8 @@ console.log('Finished after %s iterations', km.iterationCount());
 
 // Clean out/
 exec('rm -rf ./out/iteration*',
-  function (error, stdout, stderr) {
-    for(var i = 0; i < km.iterationCount(); i++) {
-      save_iteration(km.iteration(i), './out/iteration' + i + '/');
-    }
-});
-
-//algo.step()
-//res.iterationCount;
-//res.iterations;
-
-//res.iteration(0).clusters[0].vectors;
-//res.iteration(0).clusters[0].mean;
-//res.iteration(0).clusters;
-
-//res.clusters // ommit .iteration implies .iteration(res.iterationCount-1)
+     function (error, stdout, stderr) {
+       for(var i = 0; i < km.iterationCount(); i++) {
+         save_iteration(km.iteration(i), './out/iteration' + i + '/');
+       }
+     });
