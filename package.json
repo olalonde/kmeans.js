@@ -1,0 +1,15 @@
+{ "name" : "kmeans"
+, "description" : "Javascript implementation of the K-means clustering algorithm."
+, "version" : "0.0.1"
+, "directories" : { "lib" : "./lib" }
+, "main" : "./lib/kmeans"
+, "author" : { 
+    "name" : "Olivier Lalonde"
+    , "email" : "olalonde@gmail.com"
+    , "url" : "http://www.syskall.com/"
+  }
+, "repository" : { "type":"git", "url":"https://github.com/olalonde/kmeans.git" }
+, "homepage" : "https://github.com/olalonde/kmeans"
+, "dependencies": {
+  }
+}
