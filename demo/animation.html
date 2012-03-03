@@ -25,7 +25,7 @@
       google.load("jquery", "1.7.1");
       google.load("visualization", "1", {packages:["corechart"]});
       google.setOnLoadCallback(function() {
-        jQuery.get('../sample-data/data100.csv', function(data, status) {
+        jQuery.get('../sample-data/data5000.csv', function(data, status) {
           var csv_data = data;
           var data = CSVToArray(csv_data, ',', true);
           //console.log(data);
