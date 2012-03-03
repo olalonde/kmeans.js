@@ -19,7 +19,7 @@
             set[j] = new_row;
           });
         });
-    }
+      }
     </script>
     <script type="text/javascript">
       google.load("jquery", "1.7.1");
@@ -34,10 +34,13 @@
           var km = kmeans.create(data, k);
           var res = km.process();
 
-          format_sets(res.clusters);
-          console.log(res.clusters);
+          var data = res.clusters;
 
-          drawChart(res.clusters);
+          data.push(res.means);
+          format_sets(data);
+
+          console.log(data);
+          drawChart(data);
         });
       });
     </script>
@@ -45,18 +48,21 @@
       function drawChart(sets) {
         var data = new google.visualization.DataTable();
 
-        data.addColumn('number'); // x axis
+        data.addColumn('number', 'ble'); // x axis
         for(var i = 0; i < sets.length; i++)
           data.addColumn('number'); // y axises
 
-        sets.forEach(function(set) {
+        sets.forEach(function(set, i) {
           data.addRows(set);
         });
 
+        var series = {};
+        // means
+        series[sets.length - 1] = { color:'black', pointSize:12 };
+
         var options = {
           title: 'K-means demo',
-          legend: 'none',
-          series: {0:{color: 'black', visibleInLegend: false}, 1:{color: 'red', visibleInLegend: false}}
+           series: series
         };
 
         var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
