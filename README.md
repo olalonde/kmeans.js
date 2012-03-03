@@ -1,5 +1,9 @@
 # Demo #
 
+[Live demo!](http://olalonde.github.com/kmeans.js/)
+
+## On your machine ##
+
     python -m SimpleHTTPServer;
 
 Open your browser at
