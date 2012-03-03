@@ -2,6 +2,8 @@
 
 [Live demo!](http://olalonde.github.com/kmeans.js/)
 
+![K-means demo](http://dl.dropbox.com/u/3750008/Screenshots/1.png)
+
 ## On your machine ##
 
     python -m SimpleHTTPServer;
