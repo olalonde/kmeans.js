@@ -1,0 +1,74 @@
+<!-- http://code.google.com/apis/chart/interactive/docs/gallery/scatterchart.html#Example -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Demo</title>
+    <script type="text/javascript" src="../lib/vector.js"></script>
+    <script type="text/javascript" src="../lib/kmeans.js"></script>
+    <script type="text/javascript" src="../lib/utils.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script>
+      function format_sets(sets) {
+        var sets_count = sets.length;
+        sets.forEach(function(set, i) {
+          set.forEach(function(row, j) {
+            var new_row = new Array(sets_count + 1);
+            new_row[0] = row[0];
+            new_row[1 + i] = row[1];
+
+            set[j] = new_row;
+          });
+        });
+      }
+    </script>
+    <script type="text/javascript">
+      google.load("jquery", "1.7.1");
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(function() {
+        jQuery.get('./sample-data/data100.csv', function(data, status) {
+          var csv_data = data;
+          var data = CSVToArray(csv_data, ',', true);
+          //console.log(data);
+
+          var k = 4;
+          var km = kmeans.create(data, k);
+          var res = km.process();
+
+          var data = res.clusters;
+
+          data.push(res.means);
+          format_sets(data);
+          drawChart(data);
+        });
+      });
+    </script>
+    <script type="text/javascript">
+      function drawChart(sets) {
+        var data = new google.visualization.DataTable();
+
+        data.addColumn('number', 'ble'); // x axis
+        for(var i = 0; i < sets.length; i++)
+          data.addColumn('number'); // y axises
+
+        sets.forEach(function(set, i) {
+          data.addRows(set);
+        });
+
+        var series = {};
+        // means
+        series[sets.length - 1] = { color:'black', pointSize:12 };
+
+        var options = {
+          title: 'K-means demo',
+           series: series
+        };
+
+        var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
+    </script>
+  </head>
+  <body>
+    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+  </body>
+</html>
