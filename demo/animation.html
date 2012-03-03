@@ -30,15 +30,27 @@
           var data = CSVToArray(csv_data, ',', true);
           //console.log(data);
 
-          var k = 4;
+          var k = 3;
           var km = kmeans.create(data, k);
-          var res = km.process();
+          km.process();
 
-          var data = res.clusters;
+          function draw_iteration(i) {
+            var it = km.iteration(i);
+            var data = it.clusters;
+            data.push(it.means);
+            format_sets(data);
+            drawChart(data);
+          }
 
-          data.push(res.means);
-          format_sets(data);
-          drawChart(data);
+          function animate(i) {
+            draw_iteration(i);
+            if(i+1 == km.iterationCount()) return;
+            window.setTimeout(function () {
+              animate(i+1);
+            }, 1000);
+          };
+
+          animate(0);
         });
       });
     </script>
