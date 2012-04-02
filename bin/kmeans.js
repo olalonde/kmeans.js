@@ -1,9 +1,9 @@
 var kmeans = require('../lib/kmeans'),
-  vector = require('../lib/vector'),
-  utils = require('../lib/utils'),
-  fs = require('fs'),
-  path = require('path'),
-  exec = require('child_process').exec;
+vector = require('../lib/vector'),
+utils = require('../lib/utils'),
+fs = require('fs'),
+path = require('path'),
+exec = require('child_process').exec;
 
 // Parse raw data
 function raw_data_to_array() {
@@ -27,17 +27,11 @@ function raw_data_to_array() {
   return observations;
 }
 
-function array_to_csv(vectors) {
+function vectors_to_csv(vectors) {
   var output = '';
   for(var i in vectors) {
     var components = vectors[i];
-    var line = '';
-    var delim = '';
-    for(var j in components) {
-      line += delim + components[j];
-      delim = ',';
-    }
-    output += line + '\n';
+    output += components.join(',') + '\n';
   }
   return output;
 }
@@ -49,11 +43,11 @@ function save_iteration(iteration, folder) {
     fs.mkdirSync(folder);
   }
   for(var i in iteration.clusters) {
-    fs.writeFileSync(folder + 'cluster' + i + '.csv', array_to_csv(iteration.clusters[i]));
+    fs.writeFileSync(folder + 'cluster' + i + '.csv', vectors_to_csv(iteration.clusters[i]));
   }
-  fs.writeFileSync(folder + 'means.csv', array_to_csv(iteration.means));
+  fs.writeFileSync(folder + 'means.csv', vectors_to_csv(iteration.means));
+  fs.writeFileSync(folder + 'variances.csv', iteration.variances.join(','));
 }
-
 
 var filename = process.argv[2];
 var k = parseInt(process.argv[3]) || 3;
@@ -74,7 +68,7 @@ if(filename.substr(filename.length - 4, 4) === '.csv')
 else
   var data = raw_data_to_array(raw_data);
 
-console.log(data);
+console.log('Following data was retrieved from ' + filename + ': ' + data);
 var km = kmeans.create(data, k);
 var res = km.process();
 
@@ -82,9 +76,9 @@ console.log('Finished after %s iterations', km.iterationCount());
 //console.log(res.clusters());
 
 // Clean out/
-exec('rm -rf ./out/iteration*',
-     function (error, stdout, stderr) {
-       for(var i = 0; i < km.iterationCount(); i++) {
-         save_iteration(km.iteration(i), './out/iteration' + i + '/');
-       }
-     });
+exec('rm -rf ./out/iteration*', function (error, stdout, stderr) {
+  for(var i = 0; i < km.iterationCount(); i++) {
+    var iteration = km.iteration(i);
+    save_iteration(iteration, './out/iteration' + i + '/');
+  }
+});
