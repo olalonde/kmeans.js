@@ -13,7 +13,7 @@
     python -m SimpleHTTPServer;
 
 Open your browser at
-[http://localhost:8000/demo/animation.html](http://localhost:8000/demo/animation.html)
+[http://localhost:8000/demo/animation.html](http://localhost:8000/demo/)
 
 ### Command line ####
 
