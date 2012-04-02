@@ -19,7 +19,7 @@ Open your browser at
 
     $ node bin/kmeans.js sample-data/data100.csv  
 
-Resulting clusters will be written to ./out/iteration*/cluster*.csv. The last iteration represents the result of the algorithm.
+Resulting clusters will be written to ./out/iteration\*/cluster\*.csv. The last iteration represents the result of the algorithm.
 
 # Usage #
 
