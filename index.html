@@ -27,7 +27,6 @@
       google.load("visualization", "1", {packages:["corechart"]});
       google.setOnLoadCallback(function() {
 
-
         $.ajax({
           url: './data.csv',
           success: function(data) {
@@ -42,7 +41,7 @@
 
             function draw_iteration(i) {
               var it = km.iteration(i);
-              var data = it.clusters;
+              var data = it.clusters.slice(0);
               // display means and variances
               var means = [];
               for(var j in it.means) {
@@ -52,7 +51,8 @@
               $('#means').text(means.join(', '));
               $('#variances').text(it.variances.join(', '));
               // draw chart
-              data.push(it.means);
+              data.push(it.means.slice(0));
+              data.push(km.iteration(0).means.slice(0));
               format_sets(data);
               drawChart(data);
             }
@@ -100,9 +100,12 @@
       function drawChart(sets) {
         var data = new google.visualization.DataTable();
 
-        data.addColumn('number', 'ble'); // x axis
-        for(var i = 0; i < sets.length; i++)
-          data.addColumn('number'); // y axises
+        data.addColumn('number'); // x axis
+        for(var i = 0; i < sets.length - 2; i++) 
+          data.addColumn('number', 'Cluster ' + i); // y axises
+
+        data.addColumn('number', 'Centroids'); 
+        data.addColumn('number', 'Initial means'); 
 
         sets.forEach(function(set, i) {
           data.addRows(set);
@@ -110,6 +113,7 @@
 
         var series = {};
         // means
+        series[sets.length - 2] = { color:'grey' };
         series[sets.length - 1] = { color:'black', pointSize:12 };
 
         var options = {
