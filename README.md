@@ -1,15 +1,23 @@
 # Demo #
 
+## Live demo ##
+
 [Live demo!](http://olalonde.github.com/kmeans.js/)
 
 ![K-means demo](http://dl.dropbox.com/u/3750008/Screenshots/1.png)
 
 ## On your machine ##
 
+### Web ###
+
     python -m SimpleHTTPServer;
 
 Open your browser at
 [http://localhost:8000/demo/animation.html](http://localhost:8000/demo/animation.html)
+
+### Command line ####
+
+    $ node bin/kmeans.js sample-data/data100.csv  
 
 # Usage #
 
