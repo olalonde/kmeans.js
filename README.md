@@ -1,15 +1,25 @@
 # Demo #
 
+## Live demo ##
+
 [Live demo!](http://olalonde.github.com/kmeans.js/)
 
 ![K-means demo](http://dl.dropbox.com/u/3750008/Screenshots/1.png)
 
 ## On your machine ##
 
+### Web ###
+
     python -m SimpleHTTPServer;
 
 Open your browser at
 [http://localhost:8000/demo/animation.html](http://localhost:8000/demo/animation.html)
+
+### Command line ####
+
+    $ node bin/kmeans.js sample-data/data100.csv  
+
+Resulting clusters will be written to ./out/iteration*/cluster*.csv. The last iteration represents the result of the algorithm.
 
 # Usage #
 
@@ -28,7 +38,7 @@ Open your browser at
 
 ## Under the hood ##
 
-    for(var i = 0; i < km.iteratoinCount(); i++) {
+    for(var i = 0; i < km.iterationCount(); i++) {
       // clusters and means generated at iteration i
       console.log(km.iteration(i));
     }
