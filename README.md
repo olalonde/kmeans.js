@@ -28,7 +28,7 @@ Open your browser at
 
 ## Under the hood ##
 
-    for(var i = 0; i < km.iteratoinCount(); i++) {
+    for(var i = 0; i < km.iterationCount(); i++) {
       // clusters and means generated at iteration i
       console.log(km.iteration(i));
     }
