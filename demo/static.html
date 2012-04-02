@@ -3,9 +3,9 @@
 <html>
   <head>
     <title>Demo</title>
-    <script type="text/javascript" src="../lib/vector.js"></script>
-    <script type="text/javascript" src="../lib/kmeans.js"></script>
-    <script type="text/javascript" src="../lib/utils.js"></script>
+    <script type="text/javascript" src="https://raw.github.com/olalonde/kmeans.js/master/lib/vector.js"></script>
+    <script type="text/javascript" src="https://raw.github.com/olalonde/kmeans.js/master/lib/kmeans.js"></script>
+    <script type="text/javascript" src="https://raw.github.com/olalonde/kmeans.js/master/lib/utils.js"></script>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script>
       function format_sets(sets) {
@@ -25,32 +25,20 @@
       google.load("jquery", "1.7.1");
       google.load("visualization", "1", {packages:["corechart"]});
       google.setOnLoadCallback(function() {
-        jQuery.get('../sample-data/data5000.csv', function(data, status) {
+        jQuery.get('data.csv', function(data, status) {
           var csv_data = data;
           var data = CSVToArray(csv_data, ',', true);
           //console.log(data);
 
-          var k = 3;
+          var k = 4;
           var km = kmeans.create(data, k);
-          km.process();
+          var res = km.process();
 
-          function draw_iteration(i) {
-            var it = km.iteration(i);
-            var data = it.clusters;
-            data.push(it.means);
-            format_sets(data);
-            drawChart(data);
-          }
+          var data = res.clusters;
 
-          function animate(i) {
-            draw_iteration(i);
-            if(i+1 == km.iterationCount()) return;
-            window.setTimeout(function () {
-              animate(i+1);
-            }, 1000);
-          };
-
-          animate(0);
+          data.push(res.means);
+          format_sets(data);
+          drawChart(data);
         });
       });
     </script>

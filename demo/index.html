@@ -3,11 +3,12 @@
 <html>
   <head>
     <title>Demo</title>
-    <script type="text/javascript" src="../lib/vector.js"></script>
-    <script type="text/javascript" src="../lib/kmeans.js"></script>
-    <script type="text/javascript" src="../lib/utils.js"></script>
+    <script type="text/javascript" src="https://raw.github.com/olalonde/kmeans.js/master/lib/vector.js"></script>
+    <script type="text/javascript" src="https://raw.github.com/olalonde/kmeans.js/master/lib/kmeans.js"></script>
+    <script type="text/javascript" src="https://raw.github.com/olalonde/kmeans.js/master/lib/utils.js"></script>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script>
+      // Formats data for Google Charts API
       function format_sets(sets) {
         var sets_count = sets.length;
         sets.forEach(function(set, i) {
@@ -25,20 +26,73 @@
       google.load("jquery", "1.7.1");
       google.load("visualization", "1", {packages:["corechart"]});
       google.setOnLoadCallback(function() {
-        jQuery.get('../sample-data/data100.csv', function(data, status) {
-          var csv_data = data;
-          var data = CSVToArray(csv_data, ',', true);
-          //console.log(data);
 
-          var k = 4;
-          var km = kmeans.create(data, k);
-          var res = km.process();
 
-          var data = res.clusters;
+        $.ajax({
+          url: './data.csv',
+          success: function(data) {
+            var csv_data = data;
+            var data = CSVToArray(csv_data, ',', true);
+            console.log(data);
 
-          data.push(res.means);
-          format_sets(data);
-          drawChart(data);
+            var k, km;
+            k = 3;
+            km = kmeans.create(data, k);
+            km.process();
+
+            function draw_iteration(i) {
+              var it = km.iteration(i);
+              var data = it.clusters;
+              // display means and variances
+              var means = [];
+              for(var j in it.means) {
+                means.push('(' + it.means[j].join(',') + ')');
+              }
+              $('#iteration_count').text(i + '/' + (km.iterationCount()-1));
+              $('#means').text(means.join(', '));
+              $('#variances').text(it.variances.join(', '));
+              // draw chart
+              data.push(it.means);
+              format_sets(data);
+              drawChart(data);
+            }
+
+            // Animate
+            var i = 0;
+            function animate() {
+              if(play == false) return;
+              if(i == km.iterationCount()) return;
+              draw_iteration(i);
+              i++;
+              window.setTimeout(animate, 1000);
+            };
+
+            // Change K
+            $('#kval').on('change', function() {
+              k = this.value;
+              km = kmeans.create(data, k);
+              km.process();
+              i = 0;
+            });
+            // Control animation
+            var play = true;
+            if(play == true) animate();
+
+            $('#playback').on('click', function() {
+              if($(this).text() == 'Pause') {
+                play = false;
+                $(this).text('Resume');
+              }
+              else {
+                play = true;
+                animate();
+                $(this).text('Pause');
+              }
+            });
+          },
+          error: function() {
+            alert('Error fetching data. Make sure this page is served from a web server. (e.g. python -m SimpleHTTP server)');
+          }
         });
       });
     </script>
@@ -69,6 +123,23 @@
     </script>
   </head>
   <body>
+    <a href="https://github.com/olalonde/kmeans.js">kmeans.js Github repository</a>
+    <p>kmeans.js is a JS implementation of the <a href="http://en.wikipedia.org/wiki/K-means_clustering">K-means clustering algorithm</a>.
+    The initial means are chosen randomly so you will get a different result at each page refresh.</p>
+    <div>K value: 
+      <select id="kval">
+        <option>2</option>
+        <option selected>3</option>
+        <option>4</option>
+        <option>5</option>
+        <option>6</option>
+      </select>
+      <a href="#" id="playback">Pause</a></div>
     <div id="chart_div" style="width: 900px; height: 500px;"></div>
+    <ul>
+      <li>Iteration #<span id="iteration_count"></span></li>
+      <li>Means: <span id="means"></span></li>
+      <li>Variances: <span id="variances"></span></li>
+    </ul>
   </body>
 </html>
