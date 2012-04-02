@@ -35,6 +35,7 @@ Resulting clusters will be written to ./out/iteration*/cluster*.csv. The last it
 
     console.log(result.means);
     console.log(result.clusters);
+    console.log(result.variances);
 
 ## Under the hood ##
 
