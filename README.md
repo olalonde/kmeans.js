@@ -17,7 +17,7 @@ Open your browser at
 
 ### Command line ####
 
-    $ node bin/kmeans.js sample-data/data100.csv  
+    $ node bin/kmeans.js sample-data/data100.csv 3 
 
 Resulting clusters will be written to ./out/iteration\*/cluster\*.csv. The last iteration represents the result of the algorithm.
 

@@ -53,7 +53,8 @@ var filename = process.argv[2];
 var k = parseInt(process.argv[3]) || 3;
 
 if(!filename) {
-  console.log('You must provide a filename as the first argument.');
+  console.log('You must provide a filename as the first argument and optionally a value for K as a second argument.');
+  console.log('Example: node bin/kmeans.js sample-data/data5000.csv 4');
   process.exit(-1);
 }
 
