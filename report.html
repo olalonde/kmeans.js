@@ -29,7 +29,7 @@
         var data = new google.visualization.DataTable();
 
         data.addColumn('number'); // x axis
-        for(var i = 0; i < sets.length/ 2; i++) {
+        for(var i = 0; i < sets.length / 2; i++) {
           data.addColumn('number', 'c' + i); // y axises
         }
         for(var i = 0; i < sets.length / 2; i++) {
@@ -104,12 +104,12 @@
               for(var j in it.clusters) {
                 var centroids = [];
                 for(var k = 0; k <= i; k++) {
-                  centroids.push(km.iteration(k).means[j]);
+                  centroids.push(km.iteration(k).means[j].slice(0));
                 }
                 data.push(centroids);
               }
               data = format_sets(data);
-              drawChart(data, {k: k, iteration: i, iterationCount: km.iterationCount() - 1});
+              drawChart(data, {k: km.k(), iteration: i, iterationCount: km.iterationCount() - 1});
             }
           },
           error: function() {
@@ -144,7 +144,7 @@
     <div id="chart_div" style="width: 900px; height: 500px;"></div>
     <ul>
       <li>Iteration #<span id="iteration_count"></span></li>
-      <li>Means: <span id="means"></span></li>
+      <li>Centroids: <span id="centroids"></span></li>
       <li>Variances: <span id="variances"></span></li>
     </ul>
   </div>
