@@ -1,0 +1,152 @@
+<!-- http://code.google.com/apis/chart/interactive/docs/gallery/scatterchart.html#Example -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Demo</title>
+    <script type="text/javascript" src="https://raw.github.com/olalonde/kmeans.js/master/lib/vector.js"></script>
+    <script type="text/javascript" src="https://raw.github.com/olalonde/kmeans.js/master/lib/kmeans.js"></script>
+    <script type="text/javascript" src="https://raw.github.com/olalonde/kmeans.js/master/lib/utils.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script>
+      // Formats data for Google Charts API
+      function format_sets(sets) {
+        //deep copy array
+        // http://stackoverflow.com/questions/565430/deep-copying-an-array-using-jquery
+        var sets = $.extend(true, [], sets);
+        var sets_count = sets.length;
+        sets.forEach(function(set, i) {
+          set.forEach(function(row, j) {
+            var new_row = new Array(sets_count + 1);
+            new_row[0] = row[0];
+            new_row[1 + i] = row[1];
+
+            set[j] = new_row;
+          });
+        });
+        return sets;
+      }
+      function drawChart(sets, meta) {
+        var data = new google.visualization.DataTable();
+
+        data.addColumn('number'); // x axis
+        for(var i = 0; i < sets.length/ 2; i++) {
+          data.addColumn('number', 'c' + i); // y axises
+        }
+        for(var i = 0; i < sets.length / 2; i++) {
+          data.addColumn('number', 'c' + i + ' centroids'); // y axises
+        }
+
+        sets.forEach(function(set, i) {
+          data.addRows(set);
+        });
+
+        var series = {};
+
+        var options = {
+          title: 'K-means with K = ' + meta.k + ', iteration #' + meta.iteration + '/' + meta.iterationCount,
+           series: series
+        };
+
+        var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
+
+      google.load("jquery", "1.7.1");
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(function() {
+        $.ajax({
+          url: './data.csv',
+          success: function(data) {
+            var data = CSVToArray(data, ',', true);
+
+            var last_k = '', last_iteration = '', km;
+            $('#kform').on('change', function() {
+              var k = $('#kval').val();
+              var iteration = $('#iteration').val();
+
+              if(k != last_k) {
+                // k changed
+                km = kmeans.create(data, k);
+                km.process();
+                // Update Iteration select options
+                var html = '<option></option>';
+                for(var i = 0; i < km.iterationCount(); i++) {
+                  html += '<option>' + i + '</option>';
+                }
+                $('#iteration').html(html);
+                iteration = '';
+              }
+              if(iteration == '' || k == '') {
+                $('#view').hide();
+              }
+              else {
+                // refresh view
+                $('#view').show();
+                draw_iteration(km, iteration);
+              }
+              last_k = k;
+              last_iteration = iteration;
+            });
+
+            function draw_iteration(km, i) {
+              var it = km.iteration(i);
+              var data = it.clusters;
+              // display means and variances
+              var means = [];
+              for(var j in it.means) {
+                means.push('(' + it.means[j].join(',') + ')');
+              }
+              $('#iteration_count').text(i + '/' + (km.iterationCount()-1));
+              $('#means').text(means.join(', '));
+              $('#variances').text(it.variances.join(', '));
+              // draw chart
+              // for every cluster group all previous centroids in one set
+              for(var j in it.clusters) {
+                var centroids = [];
+                for(var k = 0; k <= i; k++) {
+                  centroids.push(km.iteration(k).means[j]);
+                }
+                data.push(centroids);
+              }
+              data = format_sets(data);
+              drawChart(data, {k: k, iteration: i, iterationCount: km.iterationCount() - 1});
+            }
+          },
+          error: function() {
+            alert('Error fetching data. Make sure this page is served from a web server. (e.g. python -m SimpleHTTP server)');
+          }
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <a href="https://github.com/olalonde/kmeans.js">kmeans.js Github repository</a>
+    <p>kmeans.js is a JS implementation of the <a href="http://en.wikipedia.org/wiki/K-means_clustering">K-means clustering algorithm</a>.
+    The initial means are chosen randomly so you will get a different result everytime.</p>
+
+    <form id="kform">
+      K value:
+      <select id="kval">
+        <option></option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+        <option>5</option>
+        <option>6</option>
+      </select>
+      Iteration:
+      <select id="iteration">
+        <option></option>
+      </select>
+    </form>
+
+    <div id="view" style="display:none">
+    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+    <ul>
+      <li>Iteration #<span id="iteration_count"></span></li>
+      <li>Means: <span id="means"></span></li>
+      <li>Variances: <span id="variances"></span></li>
+    </ul>
+  </div>
+  </body>
+</html>
