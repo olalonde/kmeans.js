@@ -3,9 +3,9 @@
 <html>
   <head>
     <title>Demo</title>
-    <script type="text/javascript" src="https://raw.github.com/olalonde/kmeans.js/master/lib/vector.js"></script>
-    <script type="text/javascript" src="https://raw.github.com/olalonde/kmeans.js/master/lib/kmeans.js"></script>
-    <script type="text/javascript" src="https://raw.github.com/olalonde/kmeans.js/master/lib/utils.js"></script>
+    <script type="text/javascript" src="lib/vector.js"></script>
+    <script type="text/javascript" src="lib/kmeans.js"></script>
+    <script type="text/javascript" src="lib/utils.js"></script>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script>
       // Formats data for Google Charts API
@@ -101,11 +101,11 @@
         var data = new google.visualization.DataTable();
 
         data.addColumn('number'); // x axis
-        for(var i = 0; i < sets.length - 2; i++) 
+        for(var i = 0; i < sets.length - 2; i++)
           data.addColumn('number', 'Cluster ' + i); // y axises
 
-        data.addColumn('number', 'Centroids'); 
-        data.addColumn('number', 'Initial means'); 
+        data.addColumn('number', 'Centroids');
+        data.addColumn('number', 'Initial means');
 
         sets.forEach(function(set, i) {
           data.addRows(set);
@@ -130,7 +130,7 @@
     <a href="https://github.com/olalonde/kmeans.js">kmeans.js Github repository</a>
     <p>kmeans.js is a JS implementation of the <a href="http://en.wikipedia.org/wiki/K-means_clustering">K-means clustering algorithm</a>.
     The initial means are chosen randomly so you will get a different result at each page refresh.</p>
-    <div>K value: 
+    <div>K value:
       <select id="kval">
         <option>2</option>
         <option selected>3</option>
