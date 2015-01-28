@@ -32,7 +32,7 @@
           success: function(data) {
             var csv_data = data;
             var data = CSVToArray(csv_data, ',', true);
-            console.log(data);
+            //console.log(data);
 
             var k, km;
             k = 3;
@@ -60,23 +60,26 @@
             // Animate
             var i = 0;
             function animate() {
-              if(play == false) return;
-              if(i == km.iterationCount()) return;
-              draw_iteration(i);
-              i++;
-              window.setTimeout(animate, 1000);
+              window.setInterval(function () {
+                if(play == false) return;
+                if(i == km.iterationCount()) return;
+                draw_iteration(i);
+                i++;
+              }, 200);
             };
 
             // Change K
             $('#kval').on('change', function() {
-              k = this.value;
+              k = Number(this.value);
+              if (k === NaN) return;
               km = kmeans.create(data, k);
               km.process();
               i = 0;
+              animate();
             });
             // Control animation
             var play = true;
-            if(play == true) animate();
+            //if(play == true) animate();
 
             $('#playback').on('click', function() {
               if($(this).text() == 'Pause') {
@@ -130,14 +133,15 @@
     <a href="https://github.com/olalonde/kmeans.js">kmeans.js Github repository</a>
     <p>kmeans.js is a JS implementation of the <a href="http://en.wikipedia.org/wiki/K-means_clustering">K-means clustering algorithm</a>.
     The initial means are chosen randomly so you will get a different result at each page refresh.</p>
-    <div>K value:
+    <div>Number of clusters (K value):
       <select id="kval">
+        <option>Select a value to start the animation</option>
         <option>2</option>
-        <option selected>3</option>
+        <option>3</option>
         <option>4</option>
         <option>5</option>
         <option>6</option>
-      </select>
+      </select><br>
       <a href="#" id="playback">Pause</a></div>
     <div id="chart_div" style="width: 900px; height: 500px;"></div>
     <ul>
